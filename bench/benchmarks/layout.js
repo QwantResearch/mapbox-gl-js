@@ -8,7 +8,7 @@ import {OverscaledTileID} from '../../src/source/tile_id';
 
 export default class Layout extends Benchmark {
     tiles: Array<{tileID: OverscaledTileID, buffer: ArrayBuffer}>;
-    parser: TileParser;
+    parsers: Array<TileParser>;
     style: string | StyleSpecification;
     tileIDs: Array<OverscaledTileID>;
 
@@ -26,16 +26,30 @@ export default class Layout extends Benchmark {
     setup(): Promise<void> {
         return fetchStyle(this.style)
             .then((styleJSON) => {
-                this.parser = new TileParser(styleJSON, 'composite');
-                return this.parser.setup();
+                const sources = Object.keys(styleJSON.sources);
+                this.parsers = sources.map((source) => (new TileParser(styleJSON, source)));
+                const promises = this.parsers.map(parser => parser.setup());
+                return Promise.all(promises);
             })
             .then(() => {
-                return Promise.all(this.tileIDs.map(tileID => this.parser.fetchTile(tileID)));
+                const promises = [];
+                for (const tileID of this.tileIDs) {
+                    for (const parser of this.parsers) {
+                        promises.push(parser.fetchTile(tileID));
+                    }
+                }
+                return Promise.all(promises);
             })
             .then((tiles) => {
                 this.tiles = tiles;
                 // parse tiles once to populate glyph/icon cache
-                return Promise.all(tiles.map(tile => this.parser.parseTile(tile)));
+                const promises = [];
+                for (const tile of tiles) {
+                    for (const parser of this.parsers) {
+                        promises.push(parser.parseTile(tile));
+                    }
+                }
+                return Promise.all(promises);
             })
             .then(() => {});
     }
@@ -44,7 +58,8 @@ export default class Layout extends Benchmark {
         let promise = Promise.resolve();
         for (const tile of this.tiles) {
             promise = promise.then(() => {
-                return this.parser.parseTile(tile).then(() => {});
+                const promises = this.parsers.map((parser) => (parser.parseTile(tile)));
+                return Promise.all(promises).then(() => {});
             });
         }
         return promise;

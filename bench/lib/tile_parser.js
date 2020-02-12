@@ -98,13 +98,21 @@ export default class TileParser {
             }
         };
 
-        return Promise.all([
-            createStyle(this.styleJSON),
-            fetchTileJSON(mapStub._requestManager, (this.styleJSON.sources[this.sourceID]: any).url)
-        ]).then(([style: Style, tileJSON: TileJSON]) => {
-            this.style = style;
-            this.tileJSON = tileJSON;
-        });
+        if (this.styleJSON.sources[this.sourceID].hasOwnProperty('url')) {
+            return Promise.all([
+                createStyle(this.styleJSON),
+                fetchTileJSON(mapStub._requestManager, (this.styleJSON.sources[this.sourceID]: any).url)
+            ]).then(([style: Style, tileJSON: TileJSON]) => {
+                this.style = style;
+                this.tileJSON = tileJSON;
+            });
+        } else {
+            return createStyle(this.styleJSON)
+                .then((style: Style) => {
+                    this.style = style;
+                    this.tileJSON = this.styleJSON.sources[this.sourceID];
+                });
+        }
     }
 
     fetchTile(tileID: OverscaledTileID) {

@@ -1,7 +1,7 @@
 import mapboxgl from '../../src';
 import accessToken from '../lib/access_token';
 import locationsWithTileID from '../lib/locations_with_tile_id';
-import styleBenchmarkLocations from '@mapbox/gazetteer/benchmark/style-benchmark-locations.json';
+// import styleBenchmarkLocations from '@mapbox/gazetteer/benchmark/style-benchmark-locations.json';
 import StyleLayerCreate from '../benchmarks/style_layer_create';
 import Validate from '../benchmarks/style_validate';
 import Layout from '../benchmarks/layout';
@@ -11,7 +11,59 @@ import QueryBox from '../benchmarks/query_box';
 
 import getWorkerPool from '../../src/util/global_worker_pool';
 
-const locations = locationsWithTileID(styleBenchmarkLocations.features);
+// const locations = locationsWithTileID(styleBenchmarkLocations.features);
+
+// Paris
+const latitude = 48.8575899;
+const longitude = 2.3509816;
+
+// poi tiles can't be fetched for zoom > 14
+const locations = locationsWithTileID([
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [longitude, latitude]
+        },
+        "properties": {
+            "place_name": "Paris",
+            "zoom": 14
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [longitude, latitude]
+        },
+        "properties": {
+            "place_name": "Paris",
+            "zoom": 16
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [longitude, latitude]
+        },
+        "properties": {
+            "place_name": "Paris",
+            "zoom": 18
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [longitude, latitude]
+        },
+        "properties": {
+            "place_name": "Paris",
+            "zoom": 20
+        }
+    }
+]);
 
 mapboxgl.accessToken = accessToken;
 

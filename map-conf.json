@@ -1,0 +1,10 @@
+{
+  "tileserver_base": [
+    "https://www.qwant.plive/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf"
+  ],
+  "tileserver_poi": [
+    "https://www.qwant.plive/maps/tiles/ozpoi/{z}/{x}/{y}.pbf"
+  ],
+  "spriteserver": "https://www.qwant.plive/maps/mapstyle/",
+  "fontserver": "https://www.qwant.plive/maps/mapstyle/font/"
+}
